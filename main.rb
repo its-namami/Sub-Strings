@@ -1,10 +1,15 @@
-def substring(dict, search)
-  split_search = search.split('')
+def parse_search(search)
+  search.split(' ').inject([]) do |map, word|
+    map << word.downcase.split('').select {|ch| ('a'..'z') === ch}.join
+  end
+end
 
-  dict.select {|word|
-    split_word = word.split('')
-    split_word & split_search == split_word
-  }.tally
+def substring(dict, search_words)
+  dict.each.with_object([]) do |d_word, entries|
+    entries << search_words.each.with_object([]) {|word, arr|
+      arr << word.scan(d_word)
+    }
+  end.flatten.tally
 end
 
 def ask_dict (words = [])
@@ -15,11 +20,11 @@ def ask_dict (words = [])
   words
 end
 
-def ask_string
-  print "Enter the text\n>>> "
+def ask_search
+  print "Enter the search text\n>>> "
   text = gets.chomp
-  text
+  parse_search(text)
 end
 
 puts "Welcome to Substring Search!"
-puts "Substrings:\n#{substring(ask_dict, ask_string)}"
+puts "Substrings:\n#{substring(ask_dict, ask_search)}"
